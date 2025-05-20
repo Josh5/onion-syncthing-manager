@@ -1,15 +1,15 @@
-#!/usr/bin/env bash
+#!/bin/sh
 ###
 # File: stop.sh
 # Project: bin
 # File Created: Tuesday, 20th May 2025 4:33:36 pm
 # Author: Josh.5 (jsunnex@gmail.com)
 # -----
-# Last Modified: Tuesday, 20th May 2025 4:58:17 pm
+# Last Modified: Wednesday, 21st May 2025 1:46:43 am
 # Modified By: Josh.5 (jsunnex@gmail.com)
 ###
 
-appdir="/mnt/SDCARD/App/Syncthing4Onion"
+appdir="/mnt/SDCARD/App/Syncthing Manager"
 export sysdir="${appdir:?}/../../.tmp_update"
 export miyoodir="${appdir:?}/../../miyoo"
 export LD_LIBRARY_PATH="$appdir/lib:/lib:/config/lib:$miyoodir/lib:$sysdir/lib:$sysdir/lib/parasyte"

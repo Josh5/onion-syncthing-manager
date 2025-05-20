@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 ###
 # File: test.sh
-# Project: syncthing4onion
+# Project: onion-syncthing-manager
 # File Created: Tuesday, 20th May 2025 2:15:48 pm
 # Author: Josh.5 (jsunnex@gmail.com)
 # -----
-# Last Modified: Tuesday, 20th May 2025 2:57:27 pm
+# Last Modified: Wednesday, 21st May 2025 1:46:02 am
 # Modified By: Josh.5 (jsunnex@gmail.com)
 ###
 
@@ -17,7 +17,7 @@ COLS=53
 ROWS=29
 
 # Terminal title
-TITLE="Syncthing4Onion Menu"
+TITLE="Syncthing Manager"
 
 # Check if st is available
 if command -v st >/dev/null 2>&1; then

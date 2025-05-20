@@ -1,6 +1,6 @@
 {
-"label":	"Syncthing4Onion",
-"icon":	"icon/icon.png",
-"launch":	"launch.sh",
-"description":	"Manage Syncthing installation on OnionOS"
+    "label": "Syncthing Manager",
+    "icon": "icon/icon.png",
+    "launch": "launch.sh",
+    "description": "Manage Syncthing installation on OnionOS"
 }

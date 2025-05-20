@@ -5,12 +5,23 @@
 # File Created: Tuesday, 20th May 2025 12:42:44 pm
 # Author: Josh.5 (jsunnex@gmail.com)
 # -----
-# Last Modified: Tuesday, 20th May 2025 5:52:24 pm
+# Last Modified: Wednesday, 21st May 2025 12:32:31 am
 # Modified By: Josh.5 (jsunnex@gmail.com)
 ###
 
-export TCOLS=53
-export TROWS=29
+TTY_SIZE="$(stty size 2>/dev/null)"
+TROWS="$(echo "${TTY_SIZE}" | awk '{print $1}')"
+TCOLS="$(echo "${TTY_SIZE}" | awk '{print $2}')"
+
+# User inputs
+PAD_D_UP="1B 5B 41"
+PAD_D_DOWN="1B 5B 42"
+PAD_A="20" # A = space
+PAD_B="7F" # B = backspace
+
+# Create any needed directories
+mkdir -p \
+    "${appdir:?}/logs"
 
 print_header() {
     echo "==== $1 ===="
@@ -32,6 +43,14 @@ parse_metadata() {
     awk '/^## /{sub(/^## /,""); print}' "$1"
 }
 
+delay_on_error() {
+    echo
+    echo "❌ An error occurred. See above for more information."
+    echo "Returning to menu in 5 seconds..."
+    sleep 5
+    while read -rs -t 0.1; do :; done
+}
+
 generate_menu_items_json() {
     local items_path="$1"
     local item_entries=""
@@ -49,6 +68,42 @@ generate_menu_items_json() {
 
     # Wrap in items block
     printf '{ %s }' "$item_entries"
+}
+
+generate_menu_items_ini() {
+    local items_path="$1"
+    local include_mode="$2" # should be either "include_quit" or "include_back"
+    local index=1
+    local output=""
+
+    for script in "$items_path"/*.sh; do
+        key="item$index"
+
+        # Extract title and description from the script header
+        title=$(head -n 20 "$script" | grep '^# *title:' | cut -d':' -f2- | sed 's/^ *//')
+        desc=$(head -n 20 "$script" | grep '^# *description:' | cut -d':' -f2- | sed 's/^ *//')
+
+        output="$output
+${key}.title=$title
+${key}.description=$desc
+${key}.exec=$script"
+        index=$((index + 1))
+    done
+
+    # Append Quit or Back option
+    if [ "$include_mode" = "include_quit" ]; then
+        output="$output
+item999.title=Quit
+item999.description=Quit back to OnionOS.
+item999.exec=<EXIT>"
+    elif [ "$include_mode" = "include_back" ]; then
+        output="$output
+item999.title=Back
+item999.description=Go back to previous menu.
+item999.exec=<EXIT>"
+    fi
+
+    echo "$output"
 }
 
 # Extract metadata from script
@@ -95,10 +150,9 @@ scroll_description() {
 }
 
 draw_menu() {
-    local json="$1"
-    local selected=$(echo "$json" | jq -r '.selected_item')
-    local keys=$(echo "$json" | jq -r '.items | keys[]')
-    local title=$(echo "$json" | jq -r '.menu_title // "Menu"')
+    local title="$1"
+    local selected="$2"
+    local config_ini="$3"
 
     local inner_width=$((TCOLS - 3))
     local usable_rows=$((TROWS - 1))
@@ -110,7 +164,7 @@ draw_menu() {
     printf "+%s+\n" "$(printf -- '-%.0s' $(seq 1 "$inner_width"))"
 
     # Centered menu title
-    local formatted=":: ${title} ::"
+    local formatted=":: ${title:-Menu} ::"
     local pad_left=$(((inner_width - ${#formatted}) / 2))
     printf "|%*s%s%*s|\n" "$pad_left" "" "$formatted" $((inner_width - pad_left - ${#formatted})) ""
 
@@ -118,24 +172,20 @@ draw_menu() {
     printf "+%s+\n" "$(printf -- '-%.0s' $(seq 1 "$inner_width"))"
 
     # Menu items
-    for key in $keys; do
-        entry_title=$(echo "$json" | jq -r --arg k "$key" '.items[$k].title')
+    for key in $(echo "$config_ini" | grep '\.title=' | cut -d'.' -f1 | sort -u); do
+        item_title=$(echo "$config_ini" | grep "^${key}.title=" | cut -d'=' -f2-)
         if [ "$key" = "$selected" ]; then
-            printf "| > %-*s |\n" $((inner_width - 4)) "$entry_title"
+            printf "| > %-*s |\n" $((inner_width - 4)) "$item_title"
         else
-            printf "|   %-*s |\n" $((inner_width - 4)) "$entry_title"
+            printf "|   %-*s |\n" $((inner_width - 4)) "$item_title"
         fi
         row_count=$((row_count + 1))
     done
 
-    # Fill remainder
-    local header_lines=3
-    local footer_lines=1
-    local remaining_lines=$((usable_rows - header_lines - row_count - footer_lines))
-
-    while [ "$remaining_lines" -gt 0 ]; do
+    local remaining=$((usable_rows - 4 - row_count))
+    while [ "$remaining" -gt 0 ]; do
         printf "|%*s|\n" "$inner_width" ""
-        remaining_lines=$((remaining_lines - 1))
+        remaining=$((remaining - 1))
     done
 
     # Bottom border
@@ -143,88 +193,80 @@ draw_menu() {
 }
 
 create_menu() {
-    local config_json="$1"
-    local items_json selected_key exec draw_json
-    local include_back include_quit scroll_pid menu_title
-    local keylist selected_index=0 key_count=0
+    local config_ini="$1"
+    local menu_title selected_key include_back include_quit keylist=""
+    local selected_index=0 scroll_pid
+    local screen_output
 
-    include_back=$(echo "$config_json" | jq -r '.include_back // false')
-    include_quit=$(echo "$config_json" | jq -r '.include_quit // false')
-    menu_title=$(echo "$config_json" | jq -r '.menu_title // "Menu"')
+    menu_title=$(echo "$config_ini" | grep '^menu_title=' | cut -d'=' -f2-)
+    selected_key=$(echo "$config_ini" | grep '^selected=' | cut -d'=' -f2-)
+    include_back=$(echo "$config_ini" | grep '^include_back=' | cut -d'=' -f2-)
+    include_quit=$(echo "$config_ini" | grep '^include_quit=' | cut -d'=' -f2-)
 
-    # Build enriched items JSON with metadata from headers
-    items_json=$(echo "$config_json" | jq -r '.items | to_entries[] | "\(.key)|\(.value)"' | while IFS='|' read -r key script; do
-        meta=$(get_script_metadata "$script")
-        title=$(echo "$meta" | jq -r '.title')
-        desc=$(echo "$meta" | jq -r '.description')
-        printf '"%s": { "title": "%s", "description": "%s", "exec": "%s" },\n' "$key" "$title" "$desc" "$script"
-    done)
-
-    if [ "$include_quit" = "true" ]; then
-        items_json="${items_json}\"item999\": { \"title\": \"Quit\", \"description\": \"Quit back to OnionOS.\", \"exec\": \"<EXIT>\" }"
-    elif [ "$include_back" = "true" ]; then
-        items_json="${items_json}\"item999\": { \"title\": \"Back\", \"description\": \"Go back to previous menu.\", \"exec\": \"<EXIT>\" }"
-    else
-        items_json="${items_json%,}"
-    fi
-
-    # Finalize structured menu JSON
-    items_json="{ ${items_json} }"
-
-    # Store the keys as a space-separated string
-    keylist=$(echo "$items_json" | jq -r 'keys | join(" ")')
+    # Get all item keys
+    keylist=$(echo "$config_ini" | grep '^[a-zA-Z0-9]*\.title=' | cut -d'.' -f1 | sort -u)
     key_count=$(echo "$keylist" | wc -w)
 
     # Get first key as default selected
-    selected_key=$(echo "$keylist" | cut -d' ' -f1)
+    [ -z "$selected_key" ] && selected_key=$(echo "$keylist" | awk '{print $1}')
 
     # Scroll output row (bottom of screen)
     local scroll_line=$((TROWS - 1))
 
     # Begin input loop
     while true; do
-        draw_json=$(echo "$items_json" | jq --arg sel "$selected_key" --arg title "$menu_title" '{ selected_item: $sel, menu_title: $title, items: . }')
-        draw_menu "$draw_json"
+        # Pre-fetch the full menu output. Then draw it
+        local screen_output
+        screen_output=$(draw_menu "$menu_title" "$selected_key" "$config_ini")
+        clear
+        echo -e "$screen_output"
 
-        # Start scroll line
-        desc=$(echo "$items_json" | jq -r --arg k "$selected_key" '.[$k].description')
+        # Scroll line
+        desc=$(echo "$config_ini" | grep "^${selected_key}.description=" | cut -d'=' -f2-)
         scroll_description "$desc" &
         scroll_pid=$!
 
         # Read key input
         IFS= read -rsn1 input
-        [ "$input" = $'\x1b' ] && IFS= read -rsn2 rest && input+="$rest"
+        if [ "$input" = $'\x1b' ]; then
+            IFS= read -rsn2 rest
+            input="$input$rest"
+        fi
+
+        # Convert input to hex string for matching
+        local input_hex=$(echo -n "${input:-}" | hexdump -v -e '/1 "%02X "' | sed 's/ *$//')
+        # Add logging to make it easier to debug new input devices
+        echo "Key pressed: [${input:-}] HEX: [${input_hex:-}]" >>"${appdir:?}/logs/keys.log"
 
         # Kill scroll loop and clear scroll line
-        kill "$scroll_pid" 2>/dev/null
-        printf "\033[%s;1H\033[K" "$scroll_line"
+        kill "${scroll_pid:-}" 2>/dev/null
+        printf "\033[%s;1H\033[K" "${scroll_line:-}"
 
-        case "$input" in
-        $'\x1b[A' | k)
+        case "${input_hex:-}" in
+        "${PAD_D_UP:?}")
             selected_index=$(((selected_index - 1 + key_count) % key_count))
             ;;
-        $'\x1b[B' | j)
+        "${PAD_D_DOWN:?}")
             selected_index=$(((selected_index + 1) % key_count))
             ;;
-        "" | $'\n' | $'\r')
-            exec=$(echo "$items_json" | jq -r --arg k "$selected_key" '.[$k].exec')
+        "${PAD_A:?}" | "")
+            exec=$(echo "$config_ini" | grep "^${selected_key}.exec=" | cut -d'=' -f2-)
             if [ "$exec" = "<EXIT>" ]; then
                 echo "Exit!"
                 exit 0
             fi
             clear
-            sh -c "$exec"
+            sh -c "$exec" || delay_on_error
             ;;
-        $'\x7f' | $'\x08')
-            return 0
+        "${PAD_B:?}")
+            echo return 0
             ;;
         *)
-            echo "Unhandled input: [$input]"
-            sleep 2
+            echo "(^ Unhandled by menu navigation)" >>"${appdir:?}/logs/keys.log"
             ;;
         esac
 
         # Refresh selected_key after navigation
-        selected_key=$(echo "$keylist" | cut -d' ' -f$((selected_index + 1)))
+        selected_key=$(echo "$keylist" | awk "NR==$((selected_index + 1))")
     done
 }

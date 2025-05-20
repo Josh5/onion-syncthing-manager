@@ -1,7 +1,7 @@
 #!/bin/sh
 ###
 # title: Disable Syncthing
-# description: Disables the Syncthing init scripts. Run the install/update script to re-enable.
+# description: Disables the Syncthing init scripts.
 ###
 
 cd "${appdir:?}"
@@ -19,4 +19,4 @@ echo "  Failed to remove init script."
 echo "  Syncthing will continue to run on next boot."
 echo "  You can manually disable it by removing the file:"
 echo "  '.tmp_update/startup/syncthing-startup.sh'"
-press_any_key_to_exit 1
+exit 1

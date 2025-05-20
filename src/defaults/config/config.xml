@@ -1,5 +1,5 @@
 <configuration version="37">
-    <folder id="Games/Emulation/roms" label="Games/Emulation/roms" path="/mnt/SDCARD/Roms" type="sendreceive" rescanIntervalS="3600" fsWatcherEnabled="true" fsWatcherDelayS="10" fsWatcherTimeoutS="0" ignorePerms="true" autoNormalize="true">
+    <folder id="Roms" label="Roms" path="/mnt/SDCARD/Roms" type="sendreceive" rescanIntervalS="3600" fsWatcherEnabled="true" fsWatcherDelayS="10" fsWatcherTimeoutS="0" ignorePerms="true" autoNormalize="true">
         <filesystemType>basic</filesystemType>
         <minDiskFree unit="%">1</minDiskFree>
         <versioning>
@@ -10,7 +10,7 @@
         <copiers>0</copiers>
         <pullerMaxPendingKiB>0</pullerMaxPendingKiB>
         <hashers>0</hashers>
-        <order>oldestFirst</order>
+        <order>random</order>
         <ignoreDelete>false</ignoreDelete>
         <scanProgressIntervalS>0</scanProgressIntervalS>
         <pullerPauseS>0</pullerPauseS>
@@ -37,7 +37,7 @@
             <maxTotalSize>4096</maxTotalSize>
         </xattrFilter>
     </folder>
-    <folder id="Games/Emulation/saves" label="Games/Emulation/saves" path="/mnt/SDCARD/Saves/CurrentProfile/saves" type="sendreceive" rescanIntervalS="3600" fsWatcherEnabled="true" fsWatcherDelayS="10" fsWatcherTimeoutS="0" ignorePerms="true" autoNormalize="true">
+    <folder id="Saves" label="Saves" path="/mnt/SDCARD/Saves/CurrentProfile/saves" type="sendreceive" rescanIntervalS="3600" fsWatcherEnabled="true" fsWatcherDelayS="10" fsWatcherTimeoutS="0" ignorePerms="true" autoNormalize="true">
         <filesystemType>basic</filesystemType>
         <minDiskFree unit="%">1</minDiskFree>
         <versioning type="simple">
@@ -77,7 +77,7 @@
             <maxTotalSize>4096</maxTotalSize>
         </xattrFilter>
     </folder>
-    <folder id="Games/Emulation/states" label="Games/Emulation/states" path="/mnt/SDCARD/Saves/CurrentProfile/states" type="sendreceive" rescanIntervalS="3600" fsWatcherEnabled="true" fsWatcherDelayS="10" fsWatcherTimeoutS="0" ignorePerms="true" autoNormalize="true">
+    <folder id="States" label="States" path="/mnt/SDCARD/Saves/CurrentProfile/states" type="sendreceive" rescanIntervalS="3600" fsWatcherEnabled="true" fsWatcherDelayS="10" fsWatcherTimeoutS="0" ignorePerms="true" autoNormalize="true">
         <filesystemType>basic</filesystemType>
         <minDiskFree unit="%">1</minDiskFree>
         <versioning type="simple">
@@ -119,6 +119,8 @@
     </folder>
     <gui enabled="true" tls="false" debugging="false" sendBasicAuthPrompt="false">
         <address>0.0.0.0:8384</address>
+        <user>onion</user>
+        <password>$2a$10$JMhD9DbDSgHqTXhSOPgK7e5QD3.8e/Sj2mjyrMUmpCgdCB7bAulEu</password>
         <metricsWithoutAuth>false</metricsWithoutAuth>
         <theme>default</theme>
     </gui>
