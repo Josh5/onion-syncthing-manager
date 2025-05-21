@@ -1,7 +1,9 @@
-/build/**
-/dist/**
-
+# Third-party built assets
 /**/.tmp/**
 /**/bin/syncthing
 /**/logs/**
 /**/share/**
+
+# Build environment
+/build/**
+/dist/**

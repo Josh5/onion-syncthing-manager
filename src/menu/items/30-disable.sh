@@ -5,7 +5,6 @@
 ###
 
 cd "${appdir:?}"
-. "${appdir:?}/menu/common.sh"
 . "${appdir:?}/menu/bb-menu.sh"
 
 print_title "Disabling Syncthing init script"
