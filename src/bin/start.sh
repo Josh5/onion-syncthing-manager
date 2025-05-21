@@ -5,7 +5,7 @@
 # File Created: Tuesday, 20th May 2025 4:33:32 pm
 # Author: Josh.5 (jsunnex@gmail.com)
 # -----
-# Last Modified: Wednesday, 21st May 2025 5:56:27 pm
+# Last Modified: Wednesday, 21st May 2025 7:33:40 pm
 # Modified By: Josh.5 (jsunnex@gmail.com)
 ###
 
@@ -33,5 +33,5 @@ if [ -z "${syncthing_pid:-}" ]; then
     echo "    - Web Address: ${IP:-}:8384"
     echo "    - Default username: onion"
     echo "    - Default password: onion"
-    "${appdir:?}/bin/syncthing" serve --home="${appdir:?}/config/" >"${appdir:?}/logs/syncthing.log" 2>&1 &
+    "${appdir:?}/share/syncthing/syncthing" serve --home="${appdir:?}/config/" >"${appdir:?}/logs/syncthing.log" 2>&1 &
 fi

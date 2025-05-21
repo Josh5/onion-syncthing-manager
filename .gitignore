@@ -1,6 +1,5 @@
 # Third-party built assets
 /**/.tmp/**
-/**/bin/syncthing
 /**/logs/**
 /**/share/**
 

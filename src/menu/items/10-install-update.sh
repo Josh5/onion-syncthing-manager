@@ -86,16 +86,13 @@ if [ -d "${appdir:?}/share/syncthing" ]; then
     rm -rf "${appdir:?}/share/syncthing"
 fi
 mv -f "${extracted_dir:?}" "${appdir:?}/share/syncthing"
-if [ -f "${appdir:?}/bin/syncthing" ]; then
-    rm -f "${appdir:?}/bin/syncthing"
-fi
-install -m 755 "${appdir:?}/share/syncthing/syncthing" "${appdir:?}/bin/syncthing"
+chmod +x "${appdir:?}/share/syncthing/syncthing"
 
 # Apply initial configuration
 if [ ! -f "${appdir:?}/config/config.xml" ]; then
     print_step_header "Installing default config"
     cp -f "${appdir:?}/defaults/config/config.xml" "${appdir:?}/config/config.xml"
-    "${appdir:?}/bin/syncthing" generate --no-default-folder --home="${appdir:?}/config/" >"${appdir:?}/logs/syncthing-generate.log" 2>&1 &
+    "${appdir:?}/share/syncthing/syncthing" generate --no-default-folder --home="${appdir:?}/config/" >"${appdir:?}/logs/syncthing-generate.log" 2>&1 &
     sleep 5
     pkill syncthing
     sed -i 's|name="(none)"|name="Miyoo Mini Plus"|' "${appdir:?}/config/config.xml"
