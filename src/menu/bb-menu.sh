@@ -5,7 +5,7 @@
 # File Created: Tuesday, 20th May 2025 12:42:44 pm
 # Author: Josh.5 (jsunnex@gmail.com)
 # -----
-# Last Modified: Wednesday, 21st May 2025 5:49:55 pm
+# Last Modified: Wednesday, 21st May 2025 7:26:01 pm
 # Modified By: Josh.5 (jsunnex@gmail.com)
 ###
 
@@ -220,10 +220,15 @@ create_menu() {
     local scroll_line=$((TROWS - 1))
 
     # Begin input loop
+    local menu_back="f"
     while true; do
         # Pre-fetch the full menu output. Then draw it
         local screen_output
         screen_output=$(draw_menu "$menu_title" "$selected_key" "$config_ini")
+        if [ "${menu_back:-}" = "t" ]; then
+            while read -t 1 discard; do echo "..."; done
+            menu_back="f"
+        fi
         clear
         echo -e "$screen_output"
 
@@ -263,6 +268,7 @@ create_menu() {
             fi
             clear
             sh -c "$exec" || delay_on_error
+            menu_back="t"
             ;;
         "${PAD_B:?}")
             echo return 0

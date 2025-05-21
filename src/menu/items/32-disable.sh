@@ -9,8 +9,7 @@ cd "${appdir:?}"
 
 print_title "Disabling Syncthing init script"
 
-rm -f "${sysdir:?}/startup/syncthing-startup.sh"
-if [ $? -gt 0 ]; then
+if rm -f "${sysdir:?}/startup/syncthing-startup.sh"; then
     echo "  Removed init script."
     press_any_key_to_exit 0
 fi
