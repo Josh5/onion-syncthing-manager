@@ -5,11 +5,11 @@
 # File Created: Tuesday, 20th May 2025 4:33:36 pm
 # Author: Josh.5 (jsunnex@gmail.com)
 # -----
-# Last Modified: Wednesday, 21st May 2025 1:46:43 am
+# Last Modified: Wednesday, 21st May 2025 5:56:50 pm
 # Modified By: Josh.5 (jsunnex@gmail.com)
 ###
 
-appdir="/mnt/SDCARD/App/Syncthing Manager"
+appdir="/mnt/SDCARD/App/SyncthingManager"
 export sysdir="${appdir:?}/../../.tmp_update"
 export miyoodir="${appdir:?}/../../miyoo"
 export LD_LIBRARY_PATH="$appdir/lib:/lib:/config/lib:$miyoodir/lib:$sysdir/lib:$sysdir/lib/parasyte"
