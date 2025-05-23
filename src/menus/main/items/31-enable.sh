@@ -11,8 +11,8 @@ print_title "Enabling Syncthing init script"
 
 mkdir -p "${sysdir:?}/startup"
 mkdir -p "${sysdir:?}/checkoff"
-ln -sf "${appdir:?}/bin/stop.sh" "${sysdir:?}/checkoff/syncthing-checkoff.sh"
-ln -sf "${appdir:?}/bin/start.sh" "${sysdir:?}/startup/syncthing-startup.sh"
+install -m 755 "${appdir:?}/bin/stop.sh" "${sysdir:?}/checkoff/syncthing-checkoff.sh"
+install -m 755 "${appdir:?}/bin/start.sh" "${sysdir:?}/startup/syncthing-startup.sh"
 
 echo "  Installed init scripts."
 press_any_key_to_exit 0
