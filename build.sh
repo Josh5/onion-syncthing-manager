@@ -5,13 +5,14 @@
 # File Created: Tuesday, 20th May 2025 12:12:02 pm
 # Author: Josh.5 (jsunnex@gmail.com)
 # -----
-# Last Modified: Wednesday, 21st May 2025 1:55:49 am
+# Last Modified: Friday, 23rd May 2025 10:04:44 pm
 # Modified By: Josh.5 (jsunnex@gmail.com)
 ###
 set -euo pipefail
 
 PROJECT_NAME="SyncthingManager"
 SRC_DIR="./src"
+EXT_DIR="./external"
 BUILD_ROOT="./build"
 BUILD_DIR="${BUILD_ROOT}/${PROJECT_NAME}"
 DIST_DIR="./dist"
@@ -37,6 +38,11 @@ while IFS= read -r file; do
     cp "src/${file}" "${dest}"
 done <<<"${tracked_files}"
 
+# Install external tools
+echo "▶ Installing external files to build directory..."
+install -m 755 "external/bb-menu/bb-menu" "${BUILD_DIR}/bin/bb-menu"
+
+# Archive to dist
 echo "▶ Creating zip archive..."
 cd "${BUILD_ROOT}"
 zip -rq "../${DIST_DIR}/${ZIP_NAME}" "${PROJECT_NAME}"

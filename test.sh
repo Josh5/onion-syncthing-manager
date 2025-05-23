@@ -5,12 +5,12 @@
 # File Created: Tuesday, 20th May 2025 2:15:48 pm
 # Author: Josh.5 (jsunnex@gmail.com)
 # -----
-# Last Modified: Wednesday, 21st May 2025 1:46:02 am
+# Last Modified: Friday, 23rd May 2025 10:12:20 pm
 # Modified By: Josh.5 (jsunnex@gmail.com)
 ###
 
 # Path to your main.sh script
-SCRIPT_PATH="$(dirname "$(readlink -f "$0")")/src/menu/main.sh"
+SCRIPT_PATH="$(dirname "$(readlink -f "$0")")/src/menus/run.sh"
 
 # Terminal dimensions (characters, not pixels)
 COLS=53

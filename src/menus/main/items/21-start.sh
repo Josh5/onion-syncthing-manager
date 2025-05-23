@@ -5,7 +5,7 @@
 ###
 
 cd "${appdir:?}"
-. "${appdir:?}/menu/bb-menu.sh"
+. "${appdir:?}/menus/common.sh"
 
 print_title "Starting Syncthing"
 

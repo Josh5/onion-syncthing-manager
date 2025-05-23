@@ -2,6 +2,8 @@
 /**/.tmp/**
 /**/logs/**
 /**/share/**
+/**/config/**
+/**/bin/bb-menu
 
 # Build environment
 /build/**

@@ -1,0 +1,3 @@
+[submodule "external/bb-menu"]
+	path = external/bb-menu
+	url = https://github.com/Josh5/bb-menu.git

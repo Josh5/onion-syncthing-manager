@@ -1,11 +1,9 @@
 #!/bin/sh
-###
 # title: Install/Update Syncthing
 # description: Install or update the latest Syncthing binary from the official releases and then restart the process.
-###
 
 cd "${appdir:?}"
-. "${appdir:?}/menu/bb-menu.sh"
+. "${appdir:?}/menus/common.sh"
 
 print_title "Installing/Updating Syncthing"
 
@@ -39,7 +37,7 @@ if [ -f "${appdir:?}/share/syncthing/.current_version" ]; then
         echo "    Current version: ${latest_package_version:?}."
         echo "    If you wish to re-install syncthing, first"
         echo "    remove the contents in ./share/syncthing."
-        press_any_key_to_exit 0
+        press_any_key_to_exit
     fi
 fi
 
@@ -108,4 +106,4 @@ install -m 755 "${appdir:?}/bin/stop.sh" "${sysdir:?}/checkoff/syncthing-checkof
 # Save version & quit
 echo "${latest_package_version:?}" >"${appdir:?}/share/syncthing/.current_version"
 print_step_header "Syncthing ${latest_package_version:?} installed successfully."
-press_any_key_to_exit 0
+press_any_key_to_exit
