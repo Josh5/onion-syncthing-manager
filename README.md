@@ -2,6 +2,8 @@
 
 **Syncthing Manager** is a simple graphical interface for installing, configuring, and managing [Syncthing](https://syncthing.net/) on OnionOS-based devices like the Miyoo Mini Plus.
 
+![Demo Animation](./docs/videos/example.gif)
+
 ---
 
 ## ✨ Features
